@@ -15,7 +15,7 @@ Created on Wed May  1 13:25:20 2024
 # The plots:
 #   Temperature variation with distance and time (colors are temperatures)
 
-# Christian Stanciu @ SNL, Feb 2024
+# Scott Gauvain @ SNL, Feb 2024
 ###############################################################################
 import obspy
 import numpy as np
