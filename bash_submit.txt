@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#SBATCH --time 10:00:00
+#SBATCH --partition batch
+#SBATCH -N 2
+#SBATCH -n 56
+#SBATCH -A FY230025
+#SBATCH -J ParElasti_Layers2_Het
+#SBATCH --export=ALL
+
+
+# MODULES TO LOAD
+module load openmpi-intel/4.0.3-ucx intel/18.0.5.274 cudatoolkit/10.2
+
+# ENVIRONMENT
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/ascldap/users/lpresto/shared/lib/:/home/lpresto/lib/
+
+srcfile=Src_Locs_1000m_15bpc.txt
+recfile=Rec_Locs_1000m_15bpc.txt
+
+modelname=ID100_3L_1001x1003_dh1m_maxF139fHz_hettest_100m_6p_vpvs.cdf
+
+# loop over sources
+for i in {1..11}
+do
+
+srcline=`awk '(NR==i){print $0}' i=$i $srcfile`
+oname=data/${modelname}_src$i.trace.cdf
+
+echo $srcline
+echo $oname
+
+srun -n 5 -N 1 --exclusive /home/lpresto/bin/elastic_sgfd_pml_skybridge \
+${modelname}.cdf \
+-p 2 1 2 \
+-bF -bpc 15 0.000001 150 1 \
+-Rl -Rf3 4C ${recfile} \
+-SD 0 $srcline \
+-Ro $oname &
+
+done
+
+wait
